@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import { styled } from "@mui/material/styles";
@@ -131,6 +131,8 @@ const Login = () => {
     }));
   };
 
+  let [toggle, setToggle] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isLoginDisabled) {
@@ -180,8 +182,8 @@ const Login = () => {
           // Save user details with token to localStorage
           localStorage.setItem("authToken", token);
           localStorage.setItem("loggedIn_User", JSON.stringify(loggedInUser));
-
           navigate("/home");
+          setToggle(!toggle);
           setLoginInputs({ email: "", password: "" });
         } else {
           toast.error("Invalid Email or Password!");
@@ -193,6 +195,11 @@ const Login = () => {
       toast.error("Please fill in the appropriate form to continue.");
     }
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("authToken")) {
+    }
+  }, [toggle]);
 
   return (
     <Container>
