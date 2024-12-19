@@ -3,6 +3,8 @@ import { Box, TextField, Button, Typography } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 const Container = styled(Box)({
   display: "flex",
@@ -144,39 +146,51 @@ const Login = () => {
         );
 
         if (isExistingUser) {
-          alert("User already exists!");
+          toast.error("User Already Exists!!");
         } else {
           // Add new user
           const newUser = { ...signupInputs };
           existingUsers.push(newUser);
           localStorage.setItem("users", JSON.stringify(existingUsers));
-          alert("Sign Up Successful!");
+          toast.success("Sign Up Successful !!");
           setSignupInputs({ username: "", email: "", password: "" });
         }
       } else {
-        alert("Please fill in all Sign Up details!");
+        toast.error("Please fill in all Sign Up details!");
       }
     } else if (isSignupDisabled) {
       // Log In Workflow
       if (loginInputs.email.trim() && loginInputs.password.trim()) {
         const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-        const isValidUser = existingUsers.some(
-          (user) =>
-            user.email === loginInputs.email &&
-            user.password === loginInputs.password
+        const user = existingUsers.find(
+          (u) =>
+            u.email === loginInputs.email && u.password === loginInputs.password
         );
 
-        if (isValidUser) {
+        if (user) {
+          // Generate token
+          const userUUID = uuidv4();
+          const token = btoa(`${user.password}${userUUID}`);
+          const loggedInUser = {
+            username: user.username,
+            email: user.email,
+            token: token,
+          };
+
+          // Save user details with token to localStorage
+          localStorage.setItem("authToken", token);
+          localStorage.setItem("loggedIn_User", JSON.stringify(loggedInUser));
+
           navigate("/home");
           setLoginInputs({ email: "", password: "" });
         } else {
-          alert("Invalid Email or Password!");
+          toast.error("Invalid Email or Password!");
         }
       } else {
-        alert("Please fill in all Login details!");
+        toast.error("Please fill in all Login details!");
       }
     } else {
-      alert("Please fill in the appropriate form to continue.");
+      toast.error("Please fill in the appropriate form to continue.");
     }
   };
 
