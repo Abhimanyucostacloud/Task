@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Avatar,
@@ -9,28 +9,26 @@ import {
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import logo from "./Spotify_Full_Logo_RGB_Green.png";
-import Login from "./Login";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  let navigate = useNavigate();
-  const [isLogin, setisLogin] = useState(
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(
     Boolean(localStorage.getItem("authToken"))
   );
 
-  const name = JSON.parse(localStorage.getItem("loggedIn_User"));
-  const letter = name.username.substring(0, 2).toUpperCase();
+  const user = JSON.parse(localStorage.getItem("loggedIn_User") || "{}");
+  const letter = user?.username?.substring(0, 2).toUpperCase() || "GU";
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    setisLogin(false);
+    setIsLogin(false);
     navigate("/login");
+    localStorage.removeItem("loggedIn_User");
   };
 
-  // if (!isAuthenticated) return <Login />;
-
   return (
-    <AppBar position="static" sx={{ bgcolor: "inherit", boxShadow: "none" }}>
+    <AppBar position="static" sx={{ bgcolor: "black", boxShadow: "none" }}>
       <Toolbar>
         {/* Logo */}
         <Box component="img" src={logo} alt="Logo" sx={{ height: 50, mr: 2 }} />
@@ -39,11 +37,17 @@ const Home = () => {
         <Box sx={{ flexGrow: 1 }} />
 
         {/* User Avatar and Logout */}
-        <Avatar sx={{ bgcolor: "green", mr: 2 }}>{letter}</Avatar>
-        <IconButton onClick={handleLogout} sx={{ color: "black" }}>
-          <LogoutIcon />
-          <Typography sx={{ ml: 1, fontSize: 15 }}>Logout</Typography>
-        </IconButton>
+        {isLogin && (
+          <>
+            <Avatar sx={{ bgcolor: "green", mr: 2 }}>{letter}</Avatar>
+            <IconButton onClick={handleLogout} sx={{ color: "black" }}>
+              <LogoutIcon />
+              <Typography sx={{ ml: 1, fontSize: 15, color: "white" }}>
+                Logout
+              </Typography>
+            </IconButton>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );
